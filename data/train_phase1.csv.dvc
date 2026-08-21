@@ -1,3 +1,4 @@
+# Continuous-training dataset: 5996 samples (phase 1 + phase 2)
 outs:
 - md5: 0bf11525add78e3f400eb1f211ecb39d
   size: 368068
