@@ -4,6 +4,10 @@ Course: AIInAction - VinUni
 Buổi: Day 21 - CI/CD cho AI Systems
 Khoá: K3
 
+> **Bài làm hoàn chỉnh:** xem [báo cáo kết quả](BAO_CAO_LAB.md),
+> [bộ bằng chứng](evidence/README.md), [kế hoạch và tiến độ](KE_HOACH_THUC_HIEN_LAB.md),
+> cùng [runbook triển khai GCP](DEPLOYMENT.md).
+
 
 ---
 

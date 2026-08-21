@@ -24,10 +24,13 @@ Cấu hình run 4 được chọn vì đạt đồng thời accuracy và F1 cao 
 
 Starter data giữ tên cột UCI có khoảng trắng nhưng API yêu cầu snake_case, làm model thật từ chối payload dù unit tests ban đầu qua. Script sinh dữ liệu đã được sửa để chuẩn hóa schema. MLflow 2.13 cũng không tương thích với setuptools mới do còn dùng `pkg_resources`; dependencies đã pin `setuptools==80.9.0`. Cuối cùng, kết quả phase 1 thấp hơn ngưỡng 0.70 được giữ nguyên thay vì hạ gate hoặc làm rò rỉ tập eval; continuous training với dữ liệu phase 2 là cơ chế hợp lệ để cải thiện model.
 
-## Bằng chứng cloud cần điền sau triển khai
+## Bằng chứng triển khai
 
 - GitHub repository: `https://github.com/hoangnph951/K3-Track2-Day21-2A202601951-NguyenPhucHuyHoang`
 - GCS bucket: `gs://mlops-lab-2a202601951-hoang-20260821`
 - Eval-gate run: `https://github.com/hoangnph951/K3-Track2-Day21-2A202601951-NguyenPhucHuyHoang/actions/runs/32488209563`
 - Continuous-training push run: `https://github.com/hoangnph951/K3-Track2-Day21-2A202601951-NguyenPhucHuyHoang/actions/runs/32491221331`
+- Final validation run (current workflow actions): `https://github.com/hoangnph951/K3-Track2-Day21-2A202601951-NguyenPhucHuyHoang/actions/runs/32492190893`
 - VM endpoint: `http://35.238.137.44:8000` — `/health` và `/predict` đều đã được xác minh sau deploy.
+
+GitHub Actions xác thực GCP bằng Workload Identity Federation vì project chặn service-account key. VM sử dụng attached service account; không có JSON key nào được commit hoặc chép lên VM.
