@@ -28,5 +28,6 @@ Starter data giữ tên cột UCI có khoảng trắng nhưng API yêu cầu sna
 
 - GitHub repository: `https://github.com/hoangnph951/K3-Track2-Day21-2A202601951-NguyenPhucHuyHoang`
 - GCS bucket: `gs://mlops-lab-2a202601951-hoang-20260821`
-- GitHub Actions run: `<điền URL sau khi chạy>`
-- VM endpoint: `http://35.238.137.44:8000` (service được khởi động sau pipeline continuous-training)
+- Eval-gate run: `https://github.com/hoangnph951/K3-Track2-Day21-2A202601951-NguyenPhucHuyHoang/actions/runs/32488209563`
+- Continuous-training push run: `https://github.com/hoangnph951/K3-Track2-Day21-2A202601951-NguyenPhucHuyHoang/actions/runs/32491221331`
+- VM endpoint: `http://35.238.137.44:8000` — `/health` và `/predict` đều đã được xác minh sau deploy.

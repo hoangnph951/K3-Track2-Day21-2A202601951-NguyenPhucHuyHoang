@@ -26,9 +26,9 @@ jobs:
     name: Unit Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.10"
           cache: pip
@@ -47,9 +47,9 @@ jobs:
       accuracy: ${{ steps.read_metrics.outputs.accuracy }}
       candidate_key: ${{ steps.upload_model.outputs.candidate_key }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.10"
           cache: pip
@@ -58,7 +58,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@v3
         with:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
@@ -103,7 +103,7 @@ jobs:
           echo "candidate_key=${CANDIDATE_KEY}" >> "${GITHUB_OUTPUT}"
 
       - name: Save training outputs as artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: training-outputs-${{ github.run_number }}
           path: |
@@ -137,7 +137,7 @@ jobs:
     needs: [train, eval]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.10"
 
@@ -145,7 +145,7 @@ jobs:
         run: pip install google-cloud-storage==2.16.0
 
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@v3
         with:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
@@ -171,7 +171,7 @@ jobs:
           PY
 
       - name: Restart inference service and verify health
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1.2.5
         with:
           host: ${{ secrets.VM_HOST }}
           username: ${{ secrets.VM_USER }}

@@ -246,5 +246,7 @@ Hai bonus đầu có tỷ lệ điểm trên công sức tốt nhất. Cơ chế
 - [x] Tạo script bootstrap GCP, DVC và VM runbook.
 - [x] Xác thực GCP, tạo bucket/VM và `dvc push`.
 - [x] Cấu hình Workload Identity Federation, VM deploy key và GitHub Secrets.
-- [ ] Chạy pipeline thật.
-- [ ] Thực hiện commit continuous-training và thu thập bằng chứng cloud.
+- [x] Chạy pipeline phase 1 và xác minh eval gate chặn accuracy 0.6740.
+- [x] Thực hiện commit continuous-training; push tự kích hoạt bốn jobs thành công.
+- [x] Xác minh model trên GCS và các endpoint FastAPI trên VM.
+- [x] Thu thập artifacts và bộ ảnh bằng chứng.

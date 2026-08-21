@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Google Cloud Storage Verification</title>
+  <style>
+    body { margin: 0; background: #0d1117; color: #c9d1d9; font: 20px/1.55 Consolas, monospace; }
+    main { max-width: 1500px; margin: 48px auto; padding: 36px 48px; border: 1px solid #30363d; border-radius: 12px; background: #161b22; }
+    h1 { color: #58a6ff; font: 700 34px/1.2 system-ui, sans-serif; }
+    .ok { color: #3fb950; font-weight: 700; }
+    .cmd { color: #d2a8ff; }
+    pre { white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Google Cloud Storage — DVC &amp; Model Verification</h1>
+  <p><span class="ok">✓ VERIFIED</span> 2026-08-21 — project-aa78c795-9ceb-4b68-956</p>
+  <pre><span class="cmd">$ gcloud storage ls gs://mlops-lab-2a202601951-hoang-20260821/dvc/files/md5/**</span>
+gs://.../dvc/files/md5/0b/f11525add78e3f400eb1f211ecb39d  # 5996-sample train
+gs://.../dvc/files/md5/a9/f73525e9b7c50d60f221a7c2ad0141  # train phase 2
+gs://.../dvc/files/md5/b9/fcb3b2f13cb1d7d29aae6d836e89ef  # 2998-sample train
+gs://.../dvc/files/md5/e7/f5e841dce9495ce4cd2a0806cb08c0  # eval
+
+<span class="cmd">$ gcloud storage ls --long gs://mlops-lab-2a202601951-hoang-20260821/models/**</span>
+22,932,769  models/candidates/4e4409d.../model.pkl
+43,041,473  models/candidates/a40f678.../model.pkl
+43,041,473  models/latest/model.pkl
+
+TOTAL: DVC versions available; evaluated candidate promoted to models/latest/model.pkl</pre>
+</main>
+</body>
+</html>
