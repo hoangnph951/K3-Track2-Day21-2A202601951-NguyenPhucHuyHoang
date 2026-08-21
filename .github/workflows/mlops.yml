@@ -4,7 +4,8 @@ on:
   push:
     branches: [main]
     paths:
-      - "data/**.dvc"
+      - "data/*.dvc"
+      - "data/**/*.dvc"
       - "src/**.py"
       - "tests/**.py"
       - "params.yaml"
