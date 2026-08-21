@@ -1,5 +1,6 @@
 mlflow.db
 mlartifacts/
+mlruns/
 models/
 outputs/
 data/train_phase1.csv
@@ -9,5 +10,8 @@ sa-key.json
 .env
 .venv/
 __pycache__/
+.pytest_cache/
 *.pyc
 .DS_Store
+evidence/chrome-profile/
+evidence/*.log

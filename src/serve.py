@@ -1,41 +1,75 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from google.cloud import storage
-import joblib
 import os
+from contextlib import asynccontextmanager
+from pathlib import Path
 
-app = FastAPI()
+import joblib
+import pandas as pd
+from fastapi import FastAPI, HTTPException
+from google.cloud import storage
+from pydantic import BaseModel
 
-GCS_BUCKET = os.environ["GCS_BUCKET"]
 GCS_MODEL_KEY = "models/latest/model.pkl"
-MODEL_PATH = os.path.expanduser("~/models/model.pkl")
+FEATURE_NAMES = [
+    "fixed_acidity",
+    "volatile_acidity",
+    "citric_acid",
+    "residual_sugar",
+    "chlorides",
+    "free_sulfur_dioxide",
+    "total_sulfur_dioxide",
+    "density",
+    "pH",
+    "sulphates",
+    "alcohol",
+    "wine_type",
+]
+LABELS = {0: "thap", 1: "trung_binh", 2: "cao"}
 
 
-def download_model():
-    """
-    Tai file model.pkl tu GCS ve may khi server khoi dong.
-
-    Ham nay duoc goi mot lan khi module duoc import. Su dung
-    GOOGLE_APPLICATION_CREDENTIALS de xac thuc (duoc dat trong systemd service).
-    """
-    # TODO 1: Tao storage.Client()
-    # client = storage.Client()
-
-    # TODO 2: Lay bucket va blob tuong ung
-    # bucket = client.bucket(GCS_BUCKET)
-    # blob   = bucket.blob(GCS_MODEL_KEY)
-
-    # TODO 3: Tai file model xuong may
-    # blob.download_to_filename(MODEL_PATH)
-
-    # TODO 4: In thong bao thanh cong
-    # print("Model da duoc tai xuong tu GCS.")
-
-    pass  # xoa dong nay sau khi hoan thanh tat ca TODO ben tren
+def get_model_path() -> Path:
+    return Path(os.getenv("MODEL_PATH", "~/models/model.pkl")).expanduser()
 
 
-download_model()
-model = joblib.load(MODEL_PATH)
+def download_model(
+    bucket_name: str,
+    model_key: str = GCS_MODEL_KEY,
+    destination: Path | None = None,
+) -> Path:
+    """Download the promoted model from Google Cloud Storage."""
+    destination = destination or get_model_path()
+    destination.parent.mkdir(parents=True, exist_ok=True)
+
+    client = storage.Client()
+    bucket = client.bucket(bucket_name)
+    blob = bucket.blob(model_key)
+    blob.download_to_filename(str(destination))
+    print(f"Downloaded gs://{bucket_name}/{model_key} to {destination}")
+    return destination
+
+
+def load_model():
+    """Load a local model, downloading the latest GCS model when configured."""
+    model_path = get_model_path()
+    bucket_name = os.getenv("GCS_BUCKET")
+    if bucket_name:
+        download_model(bucket_name=bucket_name, destination=model_path)
+
+    if not model_path.exists():
+        raise RuntimeError(
+            f"Model not found at {model_path}. Set GCS_BUCKET or MODEL_PATH correctly."
+        )
+    return joblib.load(model_path)
+
+
+@asynccontextmanager
+async def lifespan(fastapi_app: FastAPI):
+    if getattr(fastapi_app.state, "model", None) is None:
+        fastapi_app.state.model = load_model()
+    yield
+
+
+app = FastAPI(title="Wine Quality Classifier", version="1.0.0", lifespan=lifespan)
+app.state.model = None
 
 
 class PredictRequest(BaseModel):
@@ -44,42 +78,29 @@ class PredictRequest(BaseModel):
 
 @app.get("/health")
 def health():
-    """
-    Endpoint kiem tra suc khoe server.
-    GitHub Actions goi endpoint nay sau khi deploy de xac nhan server dang chay.
-
-    Tra ve: {"status": "ok"}
-    """
-    # TODO 5: Tra ve dict {"status": "ok"}
-    pass  # xoa dong nay sau khi hoan thanh
+    return {"status": "ok"}
 
 
 @app.post("/predict")
 def predict(req: PredictRequest):
-    """
-    Endpoint suy luan chinh.
+    if len(req.features) != len(FEATURE_NAMES):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Expected {len(FEATURE_NAMES)} features (wine quality)",
+        )
 
-    Dau vao : JSON {"features": [f1, f2, ..., f12]}
-    Dau ra  : JSON {"prediction": <0|1|2>, "label": <"thap"|"trung_binh"|"cao">}
+    model = getattr(app.state, "model", None)
+    if model is None:
+        raise HTTPException(status_code=503, detail="Model is not loaded")
 
-    Thu tu 12 dac trung (khop voi thu tu trong FEATURE_NAMES cua test):
-        fixed_acidity, volatile_acidity, citric_acid, residual_sugar,
-        chlorides, free_sulfur_dioxide, total_sulfur_dioxide, density,
-        pH, sulphates, alcohol, wine_type
-    """
-    # TODO 6: Kiem tra so luong dac trung.
-    # Neu len(req.features) != 12, raise HTTPException(status_code=400, ...)
-
-    # TODO 7: Goi model.predict([req.features]) de lay ket qua du doan.
-    # pred = model.predict(...)
-
-    # TODO 8: Tra ve dict chua "prediction" (int) va "label" (string).
-    # Nhan tuong ung: 0 -> "thap", 1 -> "trung_binh", 2 -> "cao"
-    # return {"prediction": ..., "label": ...}
-
-    pass  # xoa dong nay sau khi hoan thanh tat ca TODO ben tren
+    feature_frame = pd.DataFrame([req.features], columns=FEATURE_NAMES)
+    prediction = int(model.predict(feature_frame)[0])
+    if prediction not in LABELS:
+        raise HTTPException(status_code=500, detail="Model returned an unknown class")
+    return {"prediction": prediction, "label": LABELS[prediction]}
 
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)

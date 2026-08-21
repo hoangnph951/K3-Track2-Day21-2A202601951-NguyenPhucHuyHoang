@@ -7,6 +7,10 @@ WHITE_URL = "https://archive.ics.uci.edu/ml/machine-learning-databases/wine-qual
 df_red   = pd.read_csv(RED_URL,   sep=";")
 df_white = pd.read_csv(WHITE_URL, sep=";")
 
+# UCI uses spaces in column names while the serving contract uses snake_case.
+df_red.columns = [column.strip().replace(" ", "_") for column in df_red.columns]
+df_white.columns = [column.strip().replace(" ", "_") for column in df_white.columns]
+
 df_red["wine_type"]   = 0
 df_white["wine_type"] = 1
 

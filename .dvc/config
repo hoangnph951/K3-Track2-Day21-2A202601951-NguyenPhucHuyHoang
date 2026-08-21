@@ -1,0 +1,4 @@
+[core]
+    remote = myremote
+['remote "myremote"']
+    url = gs://mlops-lab-2a202601951-hoang-20260821/dvc
